@@ -1155,6 +1155,26 @@ class TestParameters(QiskitTestCase):
             self.assertIs(element, vec[1])
             self.assertListEqual([param.name for param in vec], _paramvec_names("x", 3))
 
+    def test_assign_cugate(self):
+        """Test assignment of CUGate"""
+
+        ps = [Parameter("t"), Parameter("p"), Parameter("l"), Parameter("g")]
+        qc = QuantumCircuit(2)
+        qc.cu(*ps, 0, 1)
+        assigned_qc = qc.assign_parameters(dict(zip(ps, [0.1, 0.2, 0.3, 0.4])), inplace=False)
+        self.assertFalse(assigned_qc.decompose().parameters)
+
+    def test_assign_controlled_gate(self):
+        """Test the assignment propagates to the base gate"""
+
+        qc = QuantumCircuit(2)
+        theta = Parameter("theta")
+        qc.crx(theta, 0, 1)
+        ctrl_qc = qc.control()
+        ctrl_qc.assign_parameters([0.5], inplace=True)
+        self.assertFalse(qiskit.transpile(ctrl_qc, basis_gates=['cx', 'u']).parameters)
+        self.assertFalse(ctrl_qc._data[0][0].base_gate._definition.parameters)
+
 
 def _construct_circuit(param, qr):
     qc = QuantumCircuit(qr)
