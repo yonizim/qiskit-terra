@@ -2595,11 +2595,14 @@ class QuantumCircuit:
                     if hasattr(instr, "base_gate") and instr.base_gate._definition:
                         instr.base_gate._definition._assign_parameter(parameter, value)
 
+                    new_instr_params = instr.params.copy()
                     # if fully bound, validate
                     if len(new_param.parameters) == 0:
-                        instr.params[param_index] = instr.validate_parameter(new_param)
+                        new_instr_params[param_index] = instr.validate_parameter(new_param)
                     else:
-                        instr.params[param_index] = new_param
+                        new_instr_params[param_index] = new_param
+
+                    instr.params = new_instr_params
 
                     self._rebind_definition(instr, parameter, value)
                 # Scoped block of a larger instruction.
