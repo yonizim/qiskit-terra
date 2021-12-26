@@ -2591,6 +2591,10 @@ class QuantumCircuit:
                 # Normal ParameterExpression.
                 if isinstance(assignee, ParameterExpression):
                     new_param = assignee.assign(parameter, value)
+
+                    if hasattr(instr, "base_gate") and instr.base_gate._definition:
+                        instr.base_gate._definition._assign_parameter(parameter, value)
+
                     # if fully bound, validate
                     if len(new_param.parameters) == 0:
                         instr.params[param_index] = instr.validate_parameter(new_param)
