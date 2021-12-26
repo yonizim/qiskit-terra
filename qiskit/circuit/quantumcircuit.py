@@ -2604,7 +2604,9 @@ class QuantumCircuit:
 
                     instr.params = new_instr_params
 
-                    self._rebind_definition(instr, parameter, value)
+                    if instr._definition:
+                        instr._definition._assign_parameter(parameter, value)
+
                 # Scoped block of a larger instruction.
                 elif isinstance(assignee, QuantumCircuit):
                     # It's possible that someone may re-use a loop body, so we need to mutate the
@@ -2663,19 +2665,6 @@ class QuantumCircuit:
                             new_cal_params.append(p)
                     schedule.assign_parameters({parameter: value})
                     cals[(qubit, tuple(new_cal_params))] = schedule
-
-    def _rebind_definition(
-        self, instruction: Instruction, parameter: Parameter, value: ParameterValueType
-    ) -> None:
-        if instruction._definition:
-            for op, _, _ in instruction._definition:
-                for idx, param in enumerate(op.params):
-                    if isinstance(param, ParameterExpression) and parameter in param.parameters:
-                        if isinstance(value, ParameterExpression):
-                            op.params[idx] = param.subs({parameter: value})
-                        else:
-                            op.params[idx] = param.bind({parameter: value})
-                        self._rebind_definition(op, parameter, value)
 
     def barrier(self, *qargs: QubitSpecifier) -> InstructionSet:
         """Apply :class:`~qiskit.circuit.Barrier`. If qargs is empty, applies to all qubits in the
