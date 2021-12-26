@@ -1,0 +1,13 @@
+---
+fixes:
+  - |
+    Changed the :meth:`~qiskit.QuantumCircuit._assign_parameter` method to solve two issues.
+    First, addes an explicit assignment of the base_gate if exists.
+    Fixes `#7410 <https://github.com/Qiskit/qiskit-terra/issues/7410>`_.
+    Second, replaces the ``"instr.params"`` attribute completely, instead of a updating each item separately.
+    This is necessary due to a unique implementation of :meth:`~qiskit.library.CUGate.parameters`.
+    Fixes `#7326 <https://github.com/Qiskit/qiskit-terra/issues/7326>`_.
+    In addition, replaces the call to :meth:`~qiskit.QuantumCircuit._rebind_definition` method by a recursive call to
+    :meth:`~qiskit.QuantumCircuit._assign_parameter`. Thus, it is possible to delete
+    :meth:`~qiskit.QuantumCircuit._rebind_definition` from :class:`~qiskit.QuantumCircuit`.
+
